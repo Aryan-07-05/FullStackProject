@@ -24,4 +24,9 @@ public class RecommendationController {
     public Recommendation addRecommendation(@RequestBody Recommendation recommendation) {
         return recommendationRepository.save(recommendation);
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteRecommendation(@PathVariable Long id) {
+        recommendationRepository.deleteById(id);
+    }
 }
