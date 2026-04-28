@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -12,36 +13,82 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await axios.post("http://localhost:8080/api/auth/login", formData);
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
-        alert("Login successful");
         navigate("/");
       } else {
         alert(response.data.message);
       }
     } catch (error) {
-      alert("Login failed");
+      alert("Login failed. Please check your credentials.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="app">
-      <div className="container" style={{ gridTemplateColumns: "1fr", maxWidth: "500px", margin: "50px auto" }}>
-        <div className="form-section">
-          <h2>Login</h2>
-          <form onSubmit={handleLogin}>
-            <input name="email" type="email" placeholder="Email" onChange={handleChange} required />
-            <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
-            <button type="submit">Login</button>
+    <div className="app auth-page">
+      <nav className="navbar">
+        <Link to="/" className="nav-logo">HomeValue+</Link>
+        <div className="nav-links">
+          <Link to="/">Home</Link>
+          <Link to="/register">Register</Link>
+        </div>
+      </nav>
+
+      <div className="auth-container">
+        <div className="auth-card">
+          <h2>Welcome Back</h2>
+          <p className="auth-subtitle">Sign in to access your property insights</p>
+
+          <form onSubmit={handleLogin} className="auth-form">
+            <div className="input-group">
+              <label htmlFor="login-email">Email</label>
+              <input
+                id="login-email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="login-password">Password</label>
+              <input
+                id="login-password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <button type="submit" disabled={loading}>
+              {loading && <span className="spinner"></span>}
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
           </form>
-          <p style={{ marginTop: "14px" }}>
-            New user? <Link to="/register">Create account</Link>
-          </p>
+
+          <div className="auth-footer">
+            <p>
+              New here? <Link to="/register">Create an account</Link>
+            </p>
+          </div>
         </div>
       </div>
+
+      <footer className="footer">
+        <p>© 2026 <span>HomeValue+</span> — All rights reserved.</p>
+      </footer>
     </div>
   );
 }
